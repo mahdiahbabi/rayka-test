@@ -1,19 +1,36 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:rayka_test/onboarding.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+  MyApp({super.key});
+  var defaultFontFamily = 'BHoma';
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
+        textTheme: TextTheme(
+            titleLarge: TextStyle(
+                fontFamily: defaultFontFamily,
+                fontSize: 20,
+                fontWeight: FontWeight.bold),
+            bodyMedium: TextStyle(fontFamily: defaultFontFamily, fontSize: 15),
+            labelLarge: TextStyle(
+                fontFamily: defaultFontFamily,
+                fontSize: 16,
+                color: Colors.grey,
+                fontWeight: FontWeight.bold)),
+        elevatedButtonTheme: const ElevatedButtonThemeData(
+            style: ButtonStyle(
+                backgroundColor: MaterialStatePropertyAll(Colors.green),
+                foregroundColor: MaterialStatePropertyAll(Colors.white))),
         // This is the theme of your application.
         //
         // TRY THIS: Try running your application with "flutter run". You'll see
@@ -32,6 +49,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      debugShowCheckedModeBanner: false,
       home: const Onboarding(),
     );
   }

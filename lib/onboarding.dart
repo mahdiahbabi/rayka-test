@@ -25,17 +25,17 @@ List<String> title = [
   'درخواست سفر',
   'تایید راننده',
   'پایش سفر',
-  '',
 ];
 List<String> description = [
-  'درخواست سفر شما به نزدیکترین راننده ها ارسال مشود',
+  'درخواست سفر در سریع ترین زمان بررسی میشود',
   'سفر یار به شما این امکان را میدهد تا مسیری ایمن را انتخاب کنید',
-  'سفر یار برلی پایش مسیر حرکت شما نیاز به دسترسی موقغیت مکانی دارد ',
+  'سفر یار برای پایش سفر نیاز به دسترسی دائمی موقعیت مکانی دارد',
 ];
 
 class _OnboardingState extends State<Onboarding> {
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context).textTheme;
     var screenSize = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
@@ -53,70 +53,71 @@ class _OnboardingState extends State<Onboarding> {
                   return Center(
                     child: Column(
                       children: [
-                        SizedBox(
-                          height: screenSize.height / 5,
-                        ),
-                        image[index],
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(title[index]),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(description[index]),
-                        index == 2
-                            ? ElevatedButton(
-                                onPressed: () async {
-                                  final status =
-                                      await Permission.location.request();
-                                  if (status.isGranted) {
-                                    Navigator.of(context)
-                                        .pushReplacement(CupertinoPageRoute(
-                                      builder: (context) => const HomeScreen(),
-                                    ));
-                                  } else if (status.isDenied) {
-                                    // The user denied the permission, you can handle this case here
-                                    // For example, you can show a dialog explaining why the permission is needed
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: Text('Location Permission'),
-                                        content: Text(
-                                            'Please grant access to location for the app to function properly.'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                            child: Text('OK'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  } else if (status.isPermanentlyDenied) {
-                                    // The user permanently denied the permission, you can navigate them to app settings
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: Text('Location Permission'),
-                                        content: Text(
-                                            'Please go to app settings and grant access to location.'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => openAppSettings(),
-                                            child: Text('Settings'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushReplacement(
+                                      CupertinoPageRoute(
+                                          builder: (context) =>
+                                              const HomeScreen()));
                                 },
-                                child: const Text('گرفتن دسترسی'),
-                              )
-                            : const SizedBox(
-                                width: 0,
-                                height: 0,
-                              )
+                                child: Text(
+                                  'رد کردن',
+                                  style: theme.labelLarge,
+                                ))
+                          ],
+                        ),
+                        SizedBox(
+                          height: screenSize.height / 10,
+                        ),
+                        SizedBox(
+                            height: screenSize.height / 3,
+                            width: screenSize.width / 1.5,
+                            child: image[index]),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          title[index],
+                          style: theme.titleLarge,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          description[index],
+                          style: theme.bodyMedium,
+                        ),
+                        if (index == 2)
+                          Padding(
+                            padding:
+                                EdgeInsets.only(top: screenSize.height / 12),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                final status =
+                                    await Permission.location.request();
+                                await Permission.locationAlways.request();
+                                if (status.isGranted) {
+                                  Navigator.of(context)
+                                      .pushReplacement(CupertinoPageRoute(
+                                    builder: (context) => const HomeScreen(),
+                                  ));
+                                } else if (status.isDenied) {
+                                  locationAccessAlert(context);
+                                } else if (status.isPermanentlyDenied) {
+                                  locationAccessAlert(context);
+                                }
+                              },
+                              child: const Text('گرفتن دسترسی'),
+                            ),
+                          )
+                        else
+                          const SizedBox(
+                            width: 0,
+                            height: 0,
+                          )
                       ],
                     ),
                   );
@@ -126,6 +127,7 @@ class _OnboardingState extends State<Onboarding> {
             Padding(
               padding: const EdgeInsets.only(bottom: 30),
               child: SmoothPageIndicator(
+                effect: const WormEffect(dotHeight: 5),
                 controller: _controller,
                 count: image.length,
                 axisDirection: Axis.horizontal,
@@ -134,6 +136,25 @@ class _OnboardingState extends State<Onboarding> {
           ],
         ),
       )),
+    );
+  }
+
+  Future<dynamic> locationAccessAlert(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text('دسترسی موقعیت مکانی'),
+          content: const Text('لطفا دسترسی به موقعیت مکانی را بدهید'),
+          actions: [
+            TextButton(
+              onPressed: () => openAppSettings(),
+              child: const Text('رفتن به تنظیمات'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
