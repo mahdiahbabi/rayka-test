@@ -31,9 +31,6 @@ dependencies:
   cupertino_icons: ^1.0.6
   smooth_page_indicator: ^1.1.0
   permission_handler: ^11.3.1
-  # background_location: ^0.13.0
-  # flutter_background_service: ^5.0.5
-  # geolocator: ^11.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
