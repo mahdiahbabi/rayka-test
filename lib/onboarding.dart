@@ -44,6 +44,20 @@ class _OnboardingState extends State<Onboarding> {
         height: screenSize.height,
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(CupertinoPageRoute(
+                          builder: (context) => const HomeScreen()));
+                    },
+                    child: Text(
+                      'رد کردن',
+                      style: theme.labelLarge,
+                    ))
+              ],
+            ),
             Expanded(
               child: PageView.builder(
                 physics: const BouncingScrollPhysics(),
@@ -53,22 +67,6 @@ class _OnboardingState extends State<Onboarding> {
                   return Center(
                     child: Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pushReplacement(
-                                      CupertinoPageRoute(
-                                          builder: (context) =>
-                                              const HomeScreen()));
-                                },
-                                child: Text(
-                                  'رد کردن',
-                                  style: theme.labelLarge,
-                                ))
-                          ],
-                        ),
                         SizedBox(
                           height: screenSize.height / 10,
                         ),
