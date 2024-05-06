@@ -31,6 +31,9 @@ dependencies:
   cupertino_icons: ^1.0.6
   smooth_page_indicator: ^1.1.0
   permission_handler: ^11.3.1
+  flutter_local_notifications: ^9.1.5
+  flutter_background_service: ^5.0.5
+  flutter_background_service_android: ^6.2.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

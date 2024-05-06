@@ -3,7 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:rayka_test/onboarding.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initiolizedService();
   runApp(MyApp());
 }
 
@@ -50,7 +52,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const Onboarding(),
+      home:  Onboarding(),
     );
   }
 }
