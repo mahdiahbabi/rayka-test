@@ -1,5 +1,6 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:async';
-import 'dart:developer';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +36,9 @@ List<String> description = [
 
 class _OnboardingState extends State<Onboarding> {
   final PageController _controller = PageController();
-  PermissionStatus status = PermissionStatus.denied;
-
+  PermissionStatus locationStatus = PermissionStatus.denied;
+  PermissionStatus notificationStatus = PermissionStatus.denied;
+  bool isBackgroundGranted = false;
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context).textTheme;
@@ -124,9 +126,10 @@ class _OnboardingState extends State<Onboarding> {
   }
 
   void _handleAccessButton() async {
-    if (status.isDenied) {
+    if (locationStatus.isDenied || notificationStatus.isDenied) {
       await _showLocationAccessDialog();
-    } else {
+    }
+    if (isBackgroundGranted == false) {
       await _showBackgroundServiceDialog();
     }
   }
@@ -137,7 +140,7 @@ class _OnboardingState extends State<Onboarding> {
       builder: (context) => AlertDialog(
         title: const Text('دسترسی به موقعیت مکانی'),
         content: const Text(
-            'برنامه نیاز به دسترسی به موقعیت شما دارد تا بتواند برای شما بهترین راهنمایی‌ها را ارائه کند'),
+            'برنامه نیاز به دسترسی به موقعیت شما و نوتیفیکیشن دارد تا بتواند برای شما بهترین راهنمایی‌ها را ارائه کند'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -146,8 +149,8 @@ class _OnboardingState extends State<Onboarding> {
           TextButton(
             onPressed: () async {
               await Permission.location.request();
-              status = await Permission.locationAlways.request();
-              await Permission.notification.request();
+              locationStatus = await Permission.locationAlways.request();
+              notificationStatus = await Permission.notification.request();
               // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
             },
@@ -171,9 +174,11 @@ class _OnboardingState extends State<Onboarding> {
             child: const Text('خیر'),
           ),
           TextButton(
-            onPressed: () async {
+            onPressed: () {
               FlutterBackgroundService().invoke('set as foreground');
-              Navigator.of(context).pop();
+              isBackgroundGranted = true;
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()));
             },
             child: const Text('بله'),
           ),
@@ -209,7 +214,7 @@ void onStart(ServiceInstance service) async {
   service.on('stop service').listen((event) {
     service.stopSelf();
   });
-  Timer.periodic(const Duration(seconds: 15), (timer) async {
+  Timer.periodic(const Duration(seconds: 17), (timer) async {
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
         service.setForegroundNotificationInfo(
@@ -217,12 +222,5 @@ void onStart(ServiceInstance service) async {
       }
     }
   });
-}
-
-  
-
-
   // service.invoke('update');
-
-
-
+}
