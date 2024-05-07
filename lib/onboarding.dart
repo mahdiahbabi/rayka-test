@@ -147,6 +147,8 @@ class _OnboardingState extends State<Onboarding> {
             onPressed: () async {
               await Permission.location.request();
               status = await Permission.locationAlways.request();
+              await Permission.notification.request();
+              // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
             },
             child: const Text('بله'),
@@ -170,7 +172,7 @@ class _OnboardingState extends State<Onboarding> {
           ),
           TextButton(
             onPressed: () async {
-              FlutterBackgroundService().invoke('set as background');
+              FlutterBackgroundService().invoke('set as foreground');
               Navigator.of(context).pop();
             },
             child: const Text('بله'),
@@ -199,10 +201,28 @@ void onStart(ServiceInstance service) async {
   if (service is AndroidServiceInstance) {
     service.on('set as background').listen((event) {
       service.setAsBackgroundService();
-      Timer.periodic(const Duration(seconds: 15), (timer) async {
-        log(timer.toString());
-      });
+    });
+    service.on('set as foreground').listen((event) {
+      service.setAsForegroundService();
     });
   }
-  service.invoke('update');
+  service.on('stop service').listen((event) {
+    service.stopSelf();
+  });
+  Timer.periodic(const Duration(seconds: 15), (timer) async {
+    if (service is AndroidServiceInstance) {
+      if (await service.isForegroundService()) {
+        service.setForegroundNotificationInfo(
+            title: 'hello', content: '$timer');
+      }
+    }
+  });
 }
+
+  
+
+
+  // service.invoke('update');
+
+
+
